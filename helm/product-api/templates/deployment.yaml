@@ -23,8 +23,26 @@ spec:
         - name: product-api
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+
           ports:
             - containerPort: {{ .Values.service.targetPort }}
+
+          env:
+            - name: DB_URL
+              value: "jdbc:mysql://cloudnative-mysql.cxsmm2ugoifk.ap-south-1.rds.amazonaws.com:3306/productdb"
+
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: product-api-db
+                  key: DB_USERNAME
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: product-api-db
+                  key: DB_PASSWORD
+
           resources:
 {{ toYaml .Values.resources | indent 12 }}
 
