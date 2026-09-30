@@ -1,0 +1,5 @@
+# Terraform state and local Terraform files must never be committed.
+**/.terraform/
+**/terraform.tfstate
+**/terraform.tfstate.*
+**/.terraform.lock.hcl
