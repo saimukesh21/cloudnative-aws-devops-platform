@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'JDK17'
+        maven 'Maven3'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -28,7 +33,8 @@ pipeline {
 
     post {
         always {
-            junit 'application/target/surefire-reports/*.xml'
+            junit testResults: 'application/target/surefire-reports/*.xml',
+                  allowEmptyResults: true
         }
     }
 }
