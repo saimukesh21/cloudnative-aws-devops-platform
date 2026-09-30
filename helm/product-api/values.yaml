@@ -1,0 +1,19 @@
+replicaCount: 2
+
+image:
+  repository: product-api
+  tag: local
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8090
+  targetPort: 8090
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
