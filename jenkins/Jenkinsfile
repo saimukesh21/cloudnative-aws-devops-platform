@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Source code is available in the Jenkins workspace'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('application') {
+                    bat 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Unit Test') {
+            steps {
+                dir('application') {
+                    bat 'mvn test'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            junit 'application/target/surefire-reports/*.xml'
+        }
+    }
+}
