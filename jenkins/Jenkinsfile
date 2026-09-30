@@ -29,6 +29,16 @@ pipeline {
                 }
             }
         }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    dir('application') {
+                        bat 'mvn sonar:sonar -Dsonar.projectKey=product-api -Dsonar.projectName=product-api'
+                    }
+                }
+            }
+        }
     }
 
     post {
