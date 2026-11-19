@@ -1,6 +1,10 @@
+
 package com.saimukesh.productapi.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
 @Entity
 @Table(name = "products")
@@ -10,9 +14,12 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Product name is required")
     @Column(nullable = false)
     private String name;
 
+    @NotNull(message = "Product price is required")
+    @PositiveOrZero(message = "Product price cannot be negative")
     @Column(nullable = false)
     private Double price;
 
