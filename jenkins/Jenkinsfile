@@ -42,6 +42,14 @@ pipeline {
             }
         }
 
+        stage('Trivy Security Scan') {
+            steps {
+                echo 'Scanning Docker image for HIGH and CRITICAL vulnerabilities...'
+
+                bat 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v trivy-cache:/root/.cache/ aquasec/trivy:0.76.2 image --scanners vuln --severity HIGH,CRITICAL --exit-code 1 product-api:%BUILD_NUMBER%'
+            }
+        }
+
         stage('Docker Verify') {
             steps {
                 bat 'docker images product-api'
@@ -59,7 +67,7 @@ pipeline {
         }
 
         success {
-            echo 'SUCCESS: Build, tests and Docker image creation completed!'
+            echo 'SUCCESS: Build, tests, Docker image and Trivy security scan completed!'
         }
 
         failure {
