@@ -13,18 +13,14 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
-                echo 'Checking out source code from GitHub...'
                 checkout scm
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building Spring Boot Product API...'
-
                 dir('application') {
                     bat 'mvn clean package -DskipTests'
                 }
@@ -33,46 +29,41 @@ pipeline {
 
         stage('Unit Tests') {
             steps {
-                echo 'Running unit tests...'
-
                 dir('application') {
                     bat 'mvn test'
                 }
             }
         }
 
-        stage('Verify Build') {
+        stage('Docker Build') {
             steps {
-                echo 'Checking generated JAR file...'
+                echo 'Building Docker image...'
+                bat 'docker build -f docker\\Dockerfile -t product-api:%BUILD_NUMBER% .'
+            }
+        }
 
-                dir('application') {
-                    bat 'dir target\\*.jar'
-                }
+        stage('Docker Verify') {
+            steps {
+                bat 'docker images product-api'
             }
         }
     }
 
     post {
         always {
-            echo 'Publishing test results...'
+            junit testResults: 'application/target/surefire-reports/*.xml',
+                  allowEmptyResults: true
 
-            junit(
-                testResults: 'application/target/surefire-reports/*.xml',
-                allowEmptyResults: true
-            )
-
-            archiveArtifacts(
-                artifacts: 'application/target/*.jar',
-                allowEmptyArchive: false
-            )
+            archiveArtifacts artifacts: 'application/target/*.jar',
+                             allowEmptyArchive: false
         }
 
         success {
-            echo 'SUCCESS: GitHub checkout, build and tests completed!'
+            echo 'SUCCESS: Build, tests and Docker image creation completed!'
         }
 
         failure {
-            echo 'FAILED: Check the Jenkins Console Output for errors.'
+            echo 'Pipeline failed. Check Console Output.'
         }
     }
 }
