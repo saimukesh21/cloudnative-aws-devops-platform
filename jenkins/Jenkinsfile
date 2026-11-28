@@ -18,6 +18,23 @@ pipeline {
             }
         }
 
+        stage('AWS Credential Test') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-jenkins-credentials',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    withEnv([
+                        'AWS_DEFAULT_REGION=ap-south-1',
+                        'AWS_REGION=ap-south-1',
+                        'AWS_EC2_METADATA_DISABLED=true'
+                    ]) {
+                        bat '"C:/Program Files/Amazon/AWSCLIV2/aws.exe" sts get-caller-identity'
+                    }
+                }
+            }
+        }
         stage('Build') {
             steps {
                 dir('application') {
