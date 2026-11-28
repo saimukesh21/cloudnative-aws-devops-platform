@@ -46,7 +46,7 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 dir('application') {
-                    bat 'mvn test'
+                    bat 'mvn -B -ntp -DforkCount=0 test'
                 }
             }
         }
