@@ -86,6 +86,35 @@ pipeline {
             }
         }
 
+        stage('ECR Push') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-jenkins-credentials',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    withEnv([
+                        'AWS_DEFAULT_REGION=ap-south-1',
+                        'AWS_REGION=ap-south-1',
+                        'AWS_EC2_METADATA_DISABLED=true'
+                    ]) {
+                        bat '''
+@echo off
+"C:/Program Files/Amazon/AWSCLIV2/aws.exe" ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 396288590846.dkr.ecr.ap-south-1.amazonaws.com
+if errorlevel 1 exit /b 1
+
+docker tag product-api:%BUILD_NUMBER% 396288590846.dkr.ecr.ap-south-1.amazonaws.com/product-api:%BUILD_NUMBER%
+if errorlevel 1 exit /b 1
+
+docker push 396288590846.dkr.ecr.ap-south-1.amazonaws.com/product-api:%BUILD_NUMBER%
+if errorlevel 1 exit /b 1
+
+docker logout 396288590846.dkr.ecr.ap-south-1.amazonaws.com
+'''
+                    }
+                }
+            }
+        }
         stage('Docker Verify') {
             steps {
                 bat 'docker images product-api'
